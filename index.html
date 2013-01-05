@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<title>旋转木马</title>
+<style type="text/css" media="screen">
+body { font-family: "微软雅黑"; }
+.whirligig {
+  width: 395px;
+  position: relative;
+}
+
+.whirligig .wrapper {
+  width: 315px; 
+  overflow: hidden;
+  min-height: 10em;
+  margin: 0 40px;
+  position: absolute;
+  top: 0;
+}
+
+.whirligig ul a img {
+  border: 5px solid #fff;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+.whirligig .wrapper ul {
+  width: 9999px;
+  list-style-image:none;
+  list-style-position:outside;
+  list-style-type:none;
+  margin:0;
+  padding:0;
+  position: absolute;
+  top: 0;
+}
+
+.whirligig ul li {
+  display:block;
+  float:left;
+  padding: 10px;
+  height: 85px;
+  width: 85px;
+}
+
+.whirligig ul li a img {
+  display:block;
+}
+
+.whirligig .arrow {
+  display: block;
+  height: 36px;
+  width: 37px;
+  background: url(ui/arrow.png) no-repeat 0 0;
+  text-indent: -999px;
+  position: absolute;
+  top: 37px;
+  cursor: pointer;
+}
+
+.whirligig .forward {
+  background-position: 0 0;
+  right: 0;
+}
+
+.whirligig .back {
+  background-position: 0 -72px;
+  left: 0;
+}
+
+.whirligig .forward:hover {
+  background-position: 0 -36px;
+}
+
+.whirligig .back:hover {
+  background-position: 0 -108px;
+}
+</style>
+
+<script src="ui/jquery-1.8.3.js"></script>
+<script type="text/javascript">
+    $.fn.whirligig=function() {
+
+      //复制字符串
+      function repeat(str,n) {
+        return new Array(n+1).join(str);
+      }
+       return this.each(function() {
+
+         var $wrapper = $(this).find("> div"),
+             $wrapperUl = $wrapper.find("> ul"),
+             $wrapperLis = $wrapperUl.find("> li"),
+             singleWidth = $wrapperLis.filter(":first").outerWidth(),//一个的宽度
+             pageCount = Math.ceil($wrapper.innerWidth() / singleWidth),//每页个数 
+             emptyCount = pageCount - $wrapperLis.length % pageCount; //需要填充的empty 个数
+
+         var resetLeft=$wrapperUl.innerWidth();
+
+         if(emptyCount != 0){ //如果empty不为0的话生产empty
+           var empty = $(this).attr("date-empty");//为了js与html解耦
+           $wrapperUl.append(repeat(empty,emptyCount));
+           $wrapperLis = $wrapperUl.find(">li");
+          }
+
+        var pageTotal =  $wrapperLis.length / pageCount;
+       $wrapperUl.append($wrapperLis.slice(0,pageCount).clone());
+       $wrapperUl.prepend($wrapperLis.slice(-pageCount).clone());
+
+       $wrapper.scrollLeft($wrapper.width());//回到真实位置
+
+       
+       var currentPage = 1; //默认第一页;
+
+       //页面切换方法
+       function changePage(page) {
+
+          var dir = page > currentPage ? 1 : -1;
+          var scrolleft = dir * $wrapper.width();
+          if($wrapper.is(':not(:animated)')){
+            $wrapper.animate({"scrollLeft":"+="+ scrolleft},200,function() {
+               currentPage = page;
+              if(page == 0){
+                $wrapper.scrollLeft(pageTotal*$wrapper.width());
+                currentPage = pageTotal;
+              }else if(page > pageTotal){
+                $wrapper.scrollLeft($wrapper.width());
+                currentPage = 1;
+             }
+            });
+          }
+       }
+
+       //方向敲击事件
+        $('a.back', this).click(function () {
+            return changePage(currentPage - 1);                
+        });
+        
+        $('a.forward', this).click(function () {
+            return changePage(currentPage + 1);
+        });
+
+    });
+   }
+
+    $(function(){
+        $(".whirligig").whirligig();
+    });
+</script>
+</head>
+<body>
+    <div class="whirligig" date-empty="<li class='empty'></li>">
+      <div  class="wrapper">
+        <ul>
+          <li><a href="#">
+            <img src="ui/website_1_index.jpg" height="75" width="75" /></a></li>
+          <li><a href="#">
+            <img src="ui/website_2_index.jpg" height="75" width="75" /></a></li>
+          <li><a href="#">
+            <img src="ui/website_3_index.jpg" height="75" width="75" /></a></li>
+          <li><a href="#">
+            <img src="ui/website_4_index.jpg" height="75" width="75"  /></a></li>
+          <li><a href="#">
+            <img src="ui/website_5_index.jpg" height="75" width="75" /></a></li>
+          <li><a href="#">
+            <img src="ui/website_6_index.jpg" height="75" width="75" /></a></li>
+          <li><a href="#">
+            <img src="ui/website_7_index.jpg" height="75" width="75" /></a></li>
+          <li><a href="#">
+            <img src="ui/website_8_index.jpg" height="75" width="75" /></a></li>
+      </ul>
+      </div>
+        <a href="#" class="arrow forward"></a>
+        <a href="#" class="arrow back"></a>       
+    </div>
+
+</body></html>
